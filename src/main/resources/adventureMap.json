@@ -1,0 +1,140 @@
+{
+  "startingRoom": "MainGate",
+  "endingRoom": "YashRoom",
+  "rooms": [
+    {
+      "name": "MainGate",
+      "description": "You are currently at the front door. This is the pathway to enter the house.\nEnter at your peril cause pathway to victory is dangerous. Find Yash in his room and you win",
+      "directions": [
+        {
+          "directionName": "North",
+          "nextRoomName": "LivingArea"
+        },
+        {
+          "directionName": "West",
+          "nextRoomName": "VisitorRoom"
+        }
+      ],
+      "items" : ["shoes", "water"]
+    },
+    {
+      "name": "LivingArea",
+      "description": "You are in the Living room with sofas and maybe a few family members holding discussions.\nThey are very protective of Yash so try to be discreet as you move through this area",
+      "directions": [
+        {
+          "directionName": "North",
+          "nextRoomName": "Veranda"
+        },
+        {
+          "directionName": "West",
+          "nextRoomName": "GuestRoom"
+        },
+        {
+          "directionName": "South",
+          "nextRoomName": "MainGate"
+        }
+      ],
+      "items" : ["heater", "telephone", "remotes"]
+    },
+    {
+      "name": "Veranda",
+      "description": "You are now in the Veranda. This a movement area which connects the house to several Rooms. \n Bask in the amazing sunlight but hurry cause time is not on your side.",
+      "directions": [
+        {
+          "directionName": "North",
+          "nextRoomName": "YashRoom"
+        },
+        {
+          "directionName": "South",
+          "nextRoomName": "LivingArea"
+        },
+        {
+          "directionName": "West",
+          "nextRoomName": "DiningArea"
+        },
+        {
+          "directionName": "East",
+          "nextRoomName": "ParentsRoom"
+        }
+      ],
+      "items" : ["table, sofas, swings, money"]
+    },
+    {
+      "name": "GuestRoom",
+      "description": "You are now in the Guest room. This is for visitors but you are an unwelcome presence so do not inhabit this room. \n RUN",
+      "directions": [
+        {
+          "directionName": "East",
+          "nextRoomName": "LivingArea"
+        },
+        {
+          "directionName": "North",
+          "nextRoomName": "DiningArea"
+        }
+      ],
+      "Items" : ["water", "wardrobes"]
+    },
+    {
+      "name": "VisitorRoom",
+      "description": "You are in the visitor room. This room is for meeting with guests. \n The sofas here are very comfy but don't forgot you have a mission on your hand",
+      "directions": [
+        {
+          "directionName": "East",
+          "nextRoomName": "MainGate"
+        }
+      ],
+      "items" : ["sofas", "carpets", "murals"]
+    },
+    {
+      "name": "DiningArea",
+      "description": "You are in the Dining Area. See the feast on display at the dining table. \n But DARE you eat anything, it's not for you. Keep Moving ",
+      "directions": [
+        {
+          "directionName": "East",
+          "nextRoomName": "Veranda"
+        },
+        {
+          "directionName": "South",
+          "nextRoomName": "GuestRoom"
+        },
+        {
+          "directionName": "North",
+          "nextRoomName": "Kitchen"
+        }
+      ],
+      "items" : ["food", "water"]
+    },
+    {
+      "name": "ParentsRoom",
+      "description": "Danger Room Alert. You are in Yash's Parents room and they don't know you have come to meet him.\n Tread at your own peril",
+      "directions": [
+        {
+          "directionName": "West",
+          "nextRoomName": "Veranda"
+        }
+      ],
+      "items" : ["parents"]
+    },
+    {
+      "name": "Kitchen",
+      "description": "You are in the kitchen. Don't let the smell of tasty food lure you. Keep focused.",
+      "directions": [
+        {
+          "directionName": "East",
+          "nextRoomName": "YashRoom"
+        },
+        {
+          "directionName": "South",
+          "nextRoomName": "DiningArea"
+        }
+      ],
+      "items" : ["groceries"]
+    },
+    {
+      "name": "YashRoom",
+      "description": "You WIN. You dared to tread on this dangerous mission but your will and determnation is admirable. \n Congratulations on finding the most charming person on the planet.",
+      "directions": [],
+      "items" : ["Yash"]
+    }
+  ]
+}
