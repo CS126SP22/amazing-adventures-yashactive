@@ -30,6 +30,9 @@ public class Room {
         this.description = description;
     }
 
+    public void setItems(String[] items) {
+        this.items = items;
+    }
 }
 
 
