@@ -27,18 +27,14 @@ public class AdventureTest {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
 
-
     @Before
     public void setUpStreams() {
         System.setOut(new PrintStream(outContent));
-
     }
-
     @After
     public void restoreStreams() {
         System.setOut(originalOut);
     }
-
     @Before
     public void setUp() {
         // This is run before every test.
