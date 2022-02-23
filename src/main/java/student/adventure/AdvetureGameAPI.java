@@ -50,40 +50,37 @@ public class AdvetureGameAPI {
     }
 
     public String executeCommands(Command inputCommand) {
-            String input = "";
-            input = inputCommand.getCommandName() + " " + inputCommand.getCommandValue();
-            String formattedInput = input.trim().toLowerCase().replaceAll(" +", " ");
-            String[] splitFormattedInput = formattedInput.split("\\s");
-            String command = splitFormattedInput[0];
+            String input1 = "";
+            input1 = inputCommand.getCommandName().trim().toLowerCase();
+            String input2 = inputCommand.getCommandValue().trim().toLowerCase();
+           // String formattedInput = input.trim().toLowerCase().replaceAll(" +", " ");
+           // String[] splitFormattedInput = formattedInput.split("\\s");
+            String command = input1;
             if (command.equals("quit") || command.equalsIgnoreCase("exit")) {
                 System.exit(0);
             }
             else if (command.equals("go")) {
-                statusOfGame = new GameStatus(false,newGameId, changeRoom(currentRoom, splitFormattedInput) ,"" , "", new AdventureState(),statusOfGame.getCommandOptions());
-                return changeRoom(currentRoom, splitFormattedInput);
+                statusOfGame = new GameStatus(false,newGameId, changeRoom(currentRoom, input2)  ,"" , "", new AdventureState(),statusOfGame.getCommandOptions());
+                return changeRoom(currentRoom, input2);
                 //displayRoomInformation(currentRoom);
             }
             else if (command.equals("take")) {
-                statusOfGame = new GameStatus(false,newGameId, takeItemFromRoom(currentRoom, formattedInput, pickedUpItems) ,"" , "", new AdventureState(),statusOfGame.getCommandOptions());
-                return takeItemFromRoom(currentRoom, formattedInput, pickedUpItems);
+                statusOfGame = new GameStatus(false,newGameId, takeItemFromRoom(currentRoom, input2, pickedUpItems) ,"" , "", new AdventureState(),statusOfGame.getCommandOptions());
+                return takeItemFromRoom(currentRoom, input2, pickedUpItems);
             }
             else if (command.equals("drop")) {
-                statusOfGame = new GameStatus(false,newGameId, dropItemInRoom(currentRoom, formattedInput, pickedUpItems) ,"" , "", new AdventureState(),statusOfGame.getCommandOptions());
-                return dropItemInRoom(currentRoom, formattedInput, pickedUpItems);
+                statusOfGame = new GameStatus(false,newGameId, dropItemInRoom(currentRoom, input2, pickedUpItems) ,"" , "", new AdventureState(),statusOfGame.getCommandOptions());
+                return dropItemInRoom(currentRoom, input2, pickedUpItems);
             }
             else if (command.equals("examine")) {
-                if (splitFormattedInput.length != 1) {
-                    return ("I don't understand "+ formattedInput);
-                    //continue;
-                }
                 statusOfGame = new GameStatus(false,newGameId, displayRoomInformation(currentRoom) ,"" , "", new AdventureState(),statusOfGame.getCommandOptions());
                 return displayRoomInformation(currentRoom);
             }
             else if (command.equals("print")) {
                 printPickedUpItemsList(pickedUpItems);
             } else {
-                statusOfGame = new GameStatus(false, newGameId, "I don't understand " + formattedInput + "!" ,"" , "", new AdventureState(),statusOfGame.getCommandOptions());
-                return ("I don't understand " + formattedInput + "!");
+                statusOfGame = new GameStatus(false, newGameId, "I don't understand " + input1 + "!" ,"" , "", new AdventureState(),statusOfGame.getCommandOptions());
+                return ("I don't understand " + input1 + "!");
 
             }
             return "";
@@ -97,11 +94,7 @@ public class AdvetureGameAPI {
      */
     public String takeItemFromRoom(Room currentRooms, String userInput, ArrayList<String> itemList) {
         String toReturn;
-        if (userInput.length() < 5) {
-            toReturn = "There is no item inputted to be taken";
-            return toReturn;
-        }
-        String input = userInput.substring(5);
+        String input = userInput;
         String[] availableItemsInRoom = currentRooms.getItems();
         for (int index = 0; index < availableItemsInRoom.length; index++) {
             if (input.equalsIgnoreCase(availableItemsInRoom[index])) {
@@ -124,10 +117,7 @@ public class AdvetureGameAPI {
      * @param itemList The ArrayList that keeps track of the items picked up by the user
      */
     public String dropItemInRoom(Room currentRooms, String userInput, ArrayList<String> itemList) {
-        if (userInput.length() < 5) {
-            return ("You didn't input an item to be dropped");
-        }
-        String input = userInput.substring(5);
+        String input = userInput;
         String[] currItemList = currentRooms.getItems();
         String[] newItemRoomList = new String[currItemList.length + 1];
         System.arraycopy(currItemList,0, newItemRoomList,0, currItemList.length);
@@ -176,19 +166,13 @@ public class AdvetureGameAPI {
      * @param currentRooms The room object representing the current room the user is in.
      * @param userInput The String array represents the input from the user
      */
-    public String changeRoom(Room currentRooms, String[] userInput) {
+    public String changeRoom(Room currentRooms, String userInput) {
         String toReturn;
-        if (userInput.length != 2) {
-            String input = String.join(" ",userInput);
-            input = input.substring(3, input.length());
-            toReturn = ("I can't go " + input);
-            return toReturn;
-        }
         Direction[] canGoDirections = currentRooms.getDirections();
         int counter = canGoDirections.length;
         Room[] rooms = gameLayout.getRooms();
         while (counter != 0) {
-            if (canGoDirections[counter - 1].getDirectionName().equalsIgnoreCase(userInput[1])) {
+            if (canGoDirections[counter - 1].getDirectionName().equalsIgnoreCase(userInput)) {
                 Direction newDirection = canGoDirections[counter - 1];
                 String nextRoomName = newDirection.getNextRoomName();
                 System.out.println(nextRoomName);
@@ -201,7 +185,7 @@ public class AdvetureGameAPI {
             }
             counter--;
         }
-        return ("I can't go " + userInput[1]);
+        return ("I can't go " + userInput);
     }
 
     /**
