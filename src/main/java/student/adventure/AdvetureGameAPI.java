@@ -1,32 +1,45 @@
 package student.adventure;
 
-import java.io.File;
+import com.google.gson.Gson;
+import student.server.AdventureState;
+import student.server.Command;
+import student.server.GameStatus;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-import com.google.gson.Gson;
-import student.server.AdventureState;
-import student.server.Command;
-import student.server.GameStatus;
-
-import static javafx.application.Platform.exit;
-
-
-public class AdventureGame {
+public class AdvetureGameAPI {
     private static Layout gameLayout;
-    private static Room currentRoom;
-    private static ArrayList<Room> roomsVisited = new ArrayList<>();
+    private static Room currentRoom = gameLayout.getStaringRoomObj();
+    private GameStatus statusOfGame;
+    private int newGameId;
+    ArrayList<String> pickedUpItems = new ArrayList<String>();
+    Room[] rooms = gameLayout.getRooms();
 
+    public AdvetureGameAPI() {
+        currentRoom = gameLayout.getStaringRoomObj();
+        pickedUpItems = new ArrayList<String>();
+        rooms = gameLayout.getRooms();
+        deserialize("src/main/resources/adventureMap.json");
+
+    }
+
+    public GameStatus getStatusOfGame() {
+        return statusOfGame;
+    }
+
+    public void setNewGameId(int newGameId) {
+        this.newGameId = newGameId;
+    }
 
 
     /**
      * The function deserializes the JSON file into POJOS using gson
      * @param myJson The string that describes the path to the JSON file
      */
-    public static void deserialize(String myJson) throws IOException {
+    public static void deserialize(String myJson)  {
         Gson gson = new Gson();
         try {
             Reader reader = Files.newBufferedReader(Paths.get(myJson));
@@ -36,26 +49,9 @@ public class AdventureGame {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        AdventureGame.deserialize("src/main/resources/adventureMap.json");
-        Room[] rooms = gameLayout.getRooms();
-        currentRoom = gameLayout.getStaringRoomObj();
-        ArrayList<String> pickedUpItems = new ArrayList<String>();
-        System.out.println("You are venturing into the NB residence. Danger and thrill awaits. \nThe real question is if you have the courage to reach Yash's Room. The ride is Bumpy ahead, tread carefully.");
-        System.out.println("\nBelow is the list of commands");
-        System.out.println("----------------------------------------------------------------------");
-        System.out.println("Go <direction> takes you to a room in that direction");
-        System.out.println("Quit or Exit to exit this danger");
-        System.out.println("Take <item> name to pick up the item from the room");
-        System.out.println("Drop <item> to drop item in the room");
-        System.out.println("Examine to examine your current location and situation");
-        System.out.println("----------------------------------------------------------------------");
-        roomsVisited.add(gameLayout.getStaringRoomObj());
-        while (true) {
-            System.out.print("> ");
-            Scanner scan = new Scanner(System.in);
+    public String executeCommands(Command inputCommand) {
             String input = "";
-            input = scan.nextLine();
+            input = inputCommand.getCommandName() + " " + inputCommand.getCommandValue();
             String formattedInput = input.trim().toLowerCase().replaceAll(" +", " ");
             String[] splitFormattedInput = formattedInput.split("\\s");
             String command = splitFormattedInput[0];
@@ -63,32 +59,35 @@ public class AdventureGame {
                 System.exit(0);
             }
             else if (command.equals("go")) {
-                changeRoom(currentRoom, splitFormattedInput);
-                displayRoomInformation(currentRoom);
+                statusOfGame = new GameStatus(false,newGameId, changeRoom(currentRoom, splitFormattedInput) ,"" , "", new AdventureState(),statusOfGame.getCommandOptions());
+                return changeRoom(currentRoom, splitFormattedInput);
+                //displayRoomInformation(currentRoom);
             }
             else if (command.equals("take")) {
-                takeItemFromRoom(currentRoom, formattedInput, pickedUpItems);
+                statusOfGame = new GameStatus(false,newGameId, takeItemFromRoom(currentRoom, formattedInput, pickedUpItems) ,"" , "", new AdventureState(),statusOfGame.getCommandOptions());
+                return takeItemFromRoom(currentRoom, formattedInput, pickedUpItems);
             }
             else if (command.equals("drop")) {
-                dropItemInRoom(currentRoom, formattedInput, pickedUpItems);
+                statusOfGame = new GameStatus(false,newGameId, dropItemInRoom(currentRoom, formattedInput, pickedUpItems) ,"" , "", new AdventureState(),statusOfGame.getCommandOptions());
+                return dropItemInRoom(currentRoom, formattedInput, pickedUpItems);
             }
             else if (command.equals("examine")) {
                 if (splitFormattedInput.length != 1) {
-                    System.out.println("I don't understand "+ formattedInput);
-                    continue;
+                    return ("I don't understand "+ formattedInput);
+                    //continue;
                 }
-                displayRoomInformation(currentRoom);
+                statusOfGame = new GameStatus(false,newGameId, displayRoomInformation(currentRoom) ,"" , "", new AdventureState(),statusOfGame.getCommandOptions());
+                return displayRoomInformation(currentRoom);
             }
             else if (command.equals("print")) {
                 printPickedUpItemsList(pickedUpItems);
-            }  else if (command.equals("printroom")) {
-                printRoomsVisited(roomsVisited);
             } else {
-                System.out.println("I don't understand " + formattedInput + "!");
+                statusOfGame = new GameStatus(false, newGameId, "I don't understand " + formattedInput + "!" ,"" , "", new AdventureState(),statusOfGame.getCommandOptions());
+                return ("I don't understand " + formattedInput + "!");
 
             }
+            return "";
         }
-    }
 
     /**
      * The function adds the item taken by the user to the itemslist while removing it from the array of items in the room
@@ -96,10 +95,11 @@ public class AdventureGame {
      * @param userInput The String with the input from the user
      * @param itemList The ArrayList that keeps track of the items picked up by the user
      */
-    public static void takeItemFromRoom(Room currentRooms, String userInput, ArrayList<String> itemList) {
+    public String takeItemFromRoom(Room currentRooms, String userInput, ArrayList<String> itemList) {
+        String toReturn;
         if (userInput.length() < 5) {
-            System.out.println("There is no item inputted to be taken");
-            return;
+            toReturn = "There is no item inputted to be taken";
+            return toReturn;
         }
         String input = userInput.substring(5);
         String[] availableItemsInRoom = currentRooms.getItems();
@@ -110,10 +110,11 @@ public class AdventureGame {
                 list.remove(input);
                 availableItemsInRoom = list.toArray(new String[0]);
                 currentRooms.setItems(availableItemsInRoom);
-                return;
+                return "executed";
             }
         }
-        System.out.println("There is no item " + input + " in the room");
+        toReturn = "There is no item " + input + " in the room";
+        return toReturn;
     }
 
     /**
@@ -122,10 +123,9 @@ public class AdventureGame {
      * @param userInput The String with the input from the user
      * @param itemList The ArrayList that keeps track of the items picked up by the user
      */
-    public static void dropItemInRoom(Room currentRooms, String userInput, ArrayList<String> itemList) {
+    public String dropItemInRoom(Room currentRooms, String userInput, ArrayList<String> itemList) {
         if (userInput.length() < 5) {
-            System.out.println("You didn't input an item to be dropped");
-            return;
+            return ("You didn't input an item to be dropped");
         }
         String input = userInput.substring(5);
         String[] currItemList = currentRooms.getItems();
@@ -136,22 +136,22 @@ public class AdventureGame {
             newItemRoomList[currItemList.length] = itemList.get(index);
             itemList.remove(input);
         } else {
-            System.out.println("You don't have " + input + "!");
-            return;
+            return ("You don't have " + input + "!");
         }
         currentRooms.setItems(newItemRoomList);
-
+        return "executed";
     }
 
     /**
      * The function prints out information like Room name, description, list of available items and available directions from the room.
      * @param currentRooms The room object representing the current room the user is in.
      */
-    public static void displayRoomInformation(Room currentRooms) {
+    public String displayRoomInformation(Room currentRooms) {
         Room currentRoomObj = currentRooms;
+        String displayMessage = "";
         if (currentRoomObj.getName().equals(gameLayout.getEndingRoom())) {
-            System.out.println("YOU WIN SUCKER");
-            System.exit(0);
+            displayMessage = "YOU WIN SUCKER";
+            return displayMessage;
         }
         String[] itemsList = currentRooms.getItems();
         Direction[] availableDirections = currentRoomObj.getDirections();
@@ -163,11 +163,12 @@ public class AdventureGame {
         }
         String availableDirectionNames = Arrays.toString(directionNames);
         availableDirectionNames = availableDirectionNames.substring(1, availableDirectionNames.length()-1);
-        System.out.println("\n"+ currentRoomObj.getDescription());
-        System.out.println("From here, you can go: "+ availableDirectionNames);
+        displayMessage += "\n"+ currentRoomObj.getDescription();
+        displayMessage += "\n" + "From here, you can go: "+ availableDirectionNames;
         String itemsInRoom = Arrays.toString(itemsList);
         itemsInRoom = itemsInRoom.substring(1, itemsInRoom.length() -1);
-        System.out.println("Items Visible: " + itemsInRoom);
+        displayMessage += "\n" + "Items Visible: " + itemsInRoom;
+        return displayMessage;
     }
 
     /**
@@ -175,32 +176,32 @@ public class AdventureGame {
      * @param currentRooms The room object representing the current room the user is in.
      * @param userInput The String array represents the input from the user
      */
-    public static void changeRoom(Room currentRooms, String[] userInput) {
+    public String changeRoom(Room currentRooms, String[] userInput) {
+        String toReturn;
         if (userInput.length != 2) {
             String input = String.join(" ",userInput);
             input = input.substring(3, input.length());
-            System.out.println("I can't go " + input);
-            return;
+            toReturn = ("I can't go " + input);
+            return toReturn;
         }
         Direction[] canGoDirections = currentRooms.getDirections();
         int counter = canGoDirections.length;
         Room[] rooms = gameLayout.getRooms();
         while (counter != 0) {
-           if (canGoDirections[counter - 1].getDirectionName().equalsIgnoreCase(userInput[1])) {
-               Direction newDirection = canGoDirections[counter - 1];
-               String nextRoomName = newDirection.getNextRoomName();
-               System.out.println(nextRoomName);
-               for (Room nextRoom : rooms) {
-                   if (nextRoom.getName().equalsIgnoreCase(nextRoomName)) {
-                       currentRoom = nextRoom;
-                       roomsVisited.add(currentRoom);
-                   }
-               }
-               return;
-           }
-           counter--;
+            if (canGoDirections[counter - 1].getDirectionName().equalsIgnoreCase(userInput[1])) {
+                Direction newDirection = canGoDirections[counter - 1];
+                String nextRoomName = newDirection.getNextRoomName();
+                System.out.println(nextRoomName);
+                for (Room nextRoom : rooms) {
+                    if (nextRoom.getName().equalsIgnoreCase(nextRoomName)) {
+                        currentRoom = nextRoom;
+                    }
+                }
+                return "executed";
+            }
+            counter--;
         }
-        System.out.println("I can't go " + userInput[1]);
+        return ("I can't go " + userInput[1]);
     }
 
     /**
@@ -208,9 +209,9 @@ public class AdventureGame {
      * @param items List of items taken by the user
      */
     public static void printPickedUpItemsList(ArrayList<String> items) {
-       for (int i = 0 ; i < items.size(); i++) {
-           System.out.println(items.get(i));
-       }
+        for (int i = 0 ; i < items.size(); i++) {
+            System.out.println(items.get(i));
+        }
     }
 
     /**
@@ -222,19 +223,6 @@ public class AdventureGame {
             System.out.println(items.get(i).getName());
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

@@ -2,7 +2,7 @@ package student.adventure;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static student.adventure.AdventureGame.changeRoom;
+//import static student.adventure.AdventureGame.changeRoom;
 
 import com.google.gson.Gson;
 import org.hamcrest.CoreMatchers;
@@ -31,11 +31,13 @@ public class AdventureTest {
     public void setUpStreams() {
         System.setOut(new PrintStream(outContent));
     }
+
     @After
     public void restoreStreams() {
         System.setOut(originalOut);
     }
-    @Before
+
+    @Test
     public void setUp() {
         // This is run before every test.
         Gson gson = new Gson();
@@ -47,6 +49,7 @@ public class AdventureTest {
             System.out.println("invalid json format");
         }
     }
+
     @Test
     public void testChangeRoom() throws IOException {
         setUp();
@@ -57,6 +60,7 @@ public class AdventureTest {
         newGame.changeRoom(currentRoom,input);
         assertEquals(currentRoom.getName(), "LivingArea");
     }
+
     @Test
     public void testChangeRoomWithInvalidDirection() throws IOException {
         setUp();
@@ -67,16 +71,19 @@ public class AdventureTest {
         newGame.changeRoom(currentRoom,input);
         assertEquals(outContent.toString(), "I can't go South");
     }
+
     @Test
     public void testGetStartingRoomObject() {
         Room currentRoom = gameLayout.getStaringRoomObj();
         assertEquals(currentRoom.getName(), gameLayout.getStartingRoom());
     }
+
     @Test
     public void testGetRoomName() {
         Room[] rooms = gameLayout.getRooms();
         assertEquals(rooms[2].getName(), "Veranda");
     }
+
     @Test
     public void testAvailableDirections() {
         Room[] rooms = gameLayout.getRooms();
@@ -90,12 +97,14 @@ public class AdventureTest {
         String[] ideaiInput = {"North", "West"};
         assertEquals(directionNames, ideaiInput);
     }
+
     @Test
     public void testGetDirectionName() {
         Room[] rooms = gameLayout.getRooms();
         Direction[] directions = rooms[1].getDirections();
         assertEquals("South", directions[2].getDirectionName());
     }
+
     @Test
     public void testDisplayRoomInformation() {
         //private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
@@ -104,39 +113,47 @@ public class AdventureTest {
         newGame.displayRoomInformation(currentRoom);
         assertEquals(idealOutput,outContent.toString());
     }
-    @Test(expected = NullPointerException.class)
+
+    @Test
     public void testDisplayRoomInformationNullRoom() throws NullPointerException {
         newGame.displayRoomInformation(null);
     }
+
     @Test
     public void testGetRoomDescripton() {
         Room[] rooms = gameLayout.getRooms();
         String descriptions = rooms[1].getDescription();
         assertEquals("You are in the Living room with sofas and maybe a few family members holding discussions.\nThey are very protective of Yash so try to be discreet as you move through this area", descriptions);
     }
+
     @Test
     public void testgetItems() {
         Room[] rooms = gameLayout.getRooms();
         String[] idealOutput = {"shoes", "water"};
         assertEquals(rooms[0].getItems(), idealOutput);
     }
+
     @Test
     public void testgetStartingRoom() {
         assertEquals("MainGate", gameLayout.getStartingRoom());
     }
+
     @Test
     public void testgetEndingRoom() {
         assertEquals("YashRoom", gameLayout.getEndingRoom());
     }
+
     @Test (expected = ArrayIndexOutOfBoundsException.class)
     public void getNonExistentRoomName() {
         gameLayout.getRooms()[10].getName();
     }
+
     @Test
     public void testGetRooms() {
         int size = gameLayout.getRooms().length;
         assertEquals(9,size );
     }
+
     @Test
     public void testTakeItemFromRoom() {
         Room currRoom = gameLayout.getStaringRoomObj();
@@ -146,6 +163,7 @@ public class AdventureTest {
         assertEquals(newList.get(0), "shoes");
 
     }
+
     @Test
     public void testTakeItemFromRoomWhichIsNotInRoom() {
         Room currRoom = gameLayout.getStaringRoomObj();
@@ -154,6 +172,7 @@ public class AdventureTest {
         newGame.takeItemFromRoom(currRoom,input,newList);
         assertEquals("There is no item hail in the room", outContent.toString());
     }
+
     @Test
     public void testTakeItemFromRoomWhichIsNotStartingRoom() {
         Room[] rooms = gameLayout.getRooms();
@@ -163,6 +182,7 @@ public class AdventureTest {
         newGame.takeItemFromRoom(currRoom,input,newList);
         assertEquals(newList.get(0), "money");
     }
+
     @Test
     public void testTakeItemFromRoomWithEmptyCommand() {
         Room currRoom = gameLayout.getStaringRoomObj();
@@ -185,6 +205,7 @@ public class AdventureTest {
         String [] newString = dropRoom.getItems();
         assertEquals("money", newString[3]);
     }
+
     @Test
     public void testDropItemInRoomNotInList() {
         Room[] rooms = gameLayout.getRooms();
@@ -194,6 +215,7 @@ public class AdventureTest {
         newGame.dropItemInRoom(dropRoom, inputDrop, newList);
         assertEquals("You don't have money!", outContent.toString());
     }
+
     @Test
     public void testDropItemWithEmptyCommand() {
         Room[] rooms = gameLayout.getRooms();
@@ -203,7 +225,4 @@ public class AdventureTest {
         newGame.dropItemInRoom(dropRoom, inputDrop, newList);
         assertEquals("You didn't input an item to be dropped", outContent.toString());
     }
-
-
-
 }

@@ -1,5 +1,6 @@
 package student.server;
 
+import java.io.IOException;
 import java.util.SortedMap;
 
 /**
@@ -36,7 +37,7 @@ public interface AdventureService {
      * @param id the instance id
      * @param command the issued command
      */
-    void executeCommand(int id, Command command);
+    void executeCommand(int id, Command command) ;
 
     /**
      * Returns a sorted leaderboard of player "high" scores.
